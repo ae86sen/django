@@ -3,6 +3,8 @@ import json
 from django.http import HttpResponse
 from django.views import View
 
+from projects.models import Projects
+from django.db import connection
 
 def index_page(request):
     if request.method == 'GET':
@@ -37,9 +39,40 @@ class IndexPage(View):
         return HttpResponse("<h2>GET请求：hello,jack!</h2>")
 
     def post(self,request,page_id):
-        # a、可以使用request.POST方法，去获取application/x-www-urldecoded
-        # b、可以使用request.body方法，去获取application/json类型的参数
-        # c、可以使用request.META方法（或request.headers方法），去获取请求头参数，key为HTTP_请求头key的大写
+        # 一、创建（C）
+        # 1、使用模型类对象来创建
+        # 会创建一个Projects模型类对象，但是还未提交
+        # project_obj = Projects(name='xxx项目4', leader='xxx项目负责人4',
+        #                        tester='xxx测试4', programmer='xxx研发4')
+        # 需要调用模型对象的save()方法，去提交
+        # project_obj.save()
+        # 2、可以使用查询集的create方法
+        # objects是manager对象，用于对数据进行操作
+        # 使用模型类.objects.create()方法，无需调用save方法
+        # project_obj = Projects.objects.create(name='xxx项目5', leader='xxx项目负责人5',
+        #                                       tester='xxx测试5', programmer='xxx研发5')
+
+        # 二、更新（U）
+        # 1、先获取模型类对象，然后修改某些字段，再调用save方法保存
+        # project_obj = Projects.objects.get(id=1)
+        # project_obj.name = '阿里云项目'
+        # project_obj.save()
+
+        # 2、可以使用模型类名.objects.filter(字段名=值).update(字段名=修改的值)
+        # one = Projects.objects.filter(id=2).update(name='腾讯云项目')
+
+        # 三、删除（D）
+        # 1、使用模型对象.delete()
+        # project_obj = Projects.objects.get(id=4)
+        # one = project_obj.delete()
+
+        # 四、查询（C）
+        # 使用objects管理器来查询
+        # 1、get方法
+        # a.一般只能使用主键或者唯一键作为查询条件
+        # b.get方法如果查询的记录为空和多条记录，那么会抛出异常
+        # c.返回的模型类对象，会自动提交
+        one = Projects.objects.get(id=1)
         data = json.loads(request.body,encoding='utf-8')
         return HttpResponse(f"<h2>POST请求：hello,{data['name']}!</h2>")
 
