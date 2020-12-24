@@ -100,3 +100,48 @@ class IndexPage(View):
 
     def delete(self, request, page_id):
         return HttpResponse("<h2>DELETE请求：hello,jack!</h2>")
+
+
+class ProjectsCR(View):
+    def get(self, request):
+        """查询所有项目"""
+        qs = Projects.objects.all()
+        projects = [i.name for i in qs]
+        x = {"所有项目": projects}
+        response = json.dumps(x)
+        return HttpResponse(response, content_type='application/json')
+
+    def post(self, request):
+        """添加项目"""
+        data = json.loads(request.body, encoding='utf-8')
+        Projects.objects.create(**data)
+        response = "{'msg':'创建成功','code':0}"
+        return HttpResponse(response, content_type='application/json')
+
+
+class ProjectsRUD(View):
+    def get(self, request, pk):
+        """查询项目详情"""
+        qs = Projects.objects.get(id=pk)
+        x = {
+            "项目名称": qs.name,
+            "项目描述": qs.desc,
+            "项目负责人": qs.leader,
+            "测试人员": qs.tester,
+            "开发人员": qs.programmer,
+        }
+        response = json.dumps(x)
+        return HttpResponse(response, content_type='application/json')
+
+    def put(self, request, pk):
+        """修改项目信息"""
+        data = json.loads(request.body, encoding='utf-8')
+        Projects.objects.filter(id=pk).update(**data)
+        response = "{'msg':'修改成功','code':0}"
+        return HttpResponse(response, content_type='application/json')
+
+    def delete(self, request, pk):
+        """删除项目"""
+        Projects.objects.filter(id=pk).delete()
+        response = "{'msg':'删除成功','code':0}"
+        return HttpResponse(response, content_type='application/json')

@@ -5,7 +5,7 @@ Time:2020/12/20
 E-mail:369799130@qq.com
 ============================
 """
-from projects.views import index_page, index_page2, IndexPage
+from projects.views import index_page, index_page2, IndexPage, ProjectsCR
 from django.urls import path
 
 urlpatterns = [
@@ -16,4 +16,5 @@ urlpatterns = [
     # 2、可以使用<url类型转化器:路径参数名>
     # 3、类型包括int、path、uuid、slug等
     path('index3/<int:page_id>', IndexPage.as_view())
+    # path('projects/', ProjectsCR.as_view())
 ]

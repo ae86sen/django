@@ -15,8 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from projects.views import index_page, index_page2
-
+from projects.views import index_page, index_page2, ProjectsCR,ProjectsRUD
 # 1、urlpatterns为名称固定的列表，用于存放路由信息
 # 2、列表中的元素个数，就是路由条数
 
@@ -33,7 +32,9 @@ from projects.views import index_page, index_page2
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('page/', include('projects.urls'))
+    path('page/', include('projects.urls')),
+    path('projects/', ProjectsCR.as_view()),
+    path('projects/<int:pk>/', ProjectsRUD.as_view())
     # path('index/', index_page),
     # path('index2/', index_page2)
 ]
