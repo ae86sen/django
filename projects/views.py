@@ -1,8 +1,11 @@
 import json
+import random
 
+from faker import Faker
 from django.http import HttpResponse
 from django.views import View
 
+from interfaces.models import Interfaces
 from projects.models import Projects
 from django.db import connection
 
@@ -37,16 +40,27 @@ class IndexPage(View):
         # 6、request.GET去获取参数字符串参数
         # 7、request.GET返回QueryDict对象，类似于一个字典，支持字典中的所有操作
         # 8、request.GET[key]、request.GET.get[key]、request.GET.getlist()去获取参数值
+        faker = Faker(locale='zh_CN')
+        for i in range(20):
+            name = faker.name()
+            print(name)
+            temp_dict = {
+                "name": name,
+                "tester": f"xxx测试0{i}",
+                "desc": "xxx描述",
+                "projects_id": random.choice([1, 2, 5, 6])
+            }
+            temp_obj = Interfaces.objects.create(**temp_dict)
         return HttpResponse("<h2>GET请求：hello,jack!</h2>")
 
     def post(self, request, page_id):
         # 一、创建（C）
         # 1、使用模型类对象来创建
         # 会创建一个Projects模型类对象，但是还未提交
-        # project_obj = Projects(name='xxx项目4', leader='xxx项目负责人4',
-        #                        tester='xxx测试4', programmer='xxx研发4')
+        project_obj = Projects(name='共享单车项目', leader='xxx项目负责人4',
+                               tester='xxx测试5', programmer='xxx研发6')
         # 需要调用模型对象的save()方法，去提交
-        # project_obj.save()
+        project_obj.save()
         # 2、可以使用查询集的create方法
         # objects是manager对象，用于对数据进行操作
         # 使用模型类.objects.create()方法，无需调用save方法
@@ -73,7 +87,8 @@ class IndexPage(View):
         # a.一般只能使用主键或者唯一键作为查询条件
         # b.get方法如果查询的记录为空和多条记录，那么会抛出异常
         # c.返回的模型类对象，会自动提交
-        one = Projects.objects.get(id=1)
+        # one = Projects.objects.get(id=1)
+        # qs = Projects.objects.all()
         data = json.loads(request.body, encoding='utf-8')
         return HttpResponse(f"<h2>POST请求：hello,{data['name']}!</h2>")
 
@@ -85,3 +100,48 @@ class IndexPage(View):
 
     def delete(self, request, page_id):
         return HttpResponse("<h2>DELETE请求：hello,jack!</h2>")
+
+
+class ProjectsCR(View):
+    def get(self, request):
+        """查询所有项目"""
+        qs = Projects.objects.all()
+        projects = [i.name for i in qs]
+        x = {"所有项目": projects}
+        response = json.dumps(x)
+        return HttpResponse(response, content_type='application/json')
+
+    def post(self, request):
+        """添加项目"""
+        data = json.loads(request.body, encoding='utf-8')
+        Projects.objects.create(**data)
+        response = "{'msg':'创建成功','code':0}"
+        return HttpResponse(response, content_type='application/json')
+
+
+class ProjectsRUD(View):
+    def get(self, request, pk):
+        """查询项目详情"""
+        qs = Projects.objects.get(id=pk)
+        x = {
+            "项目名称": qs.name,
+            "项目描述": qs.desc,
+            "项目负责人": qs.leader,
+            "测试人员": qs.tester,
+            "开发人员": qs.programmer,
+        }
+        response = json.dumps(x)
+        return HttpResponse(response, content_type='application/json')
+
+    def put(self, request, pk):
+        """修改项目信息"""
+        data = json.loads(request.body, encoding='utf-8')
+        Projects.objects.filter(id=pk).update(**data)
+        response = "{'msg':'修改成功','code':0}"
+        return HttpResponse(response, content_type='application/json')
+
+    def delete(self, request, pk):
+        """删除项目"""
+        Projects.objects.filter(id=pk).delete()
+        response = "{'msg':'删除成功','code':0}"
+        return HttpResponse(response, content_type='application/json')
