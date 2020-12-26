@@ -1,0 +1,28 @@
+需求：
+设置5个接口，来供前端使用对项目的增删改查操作
+1、需要能获取到项目的列数数据（获取多条项目数据或所有数据）
+url:/projects/
+method:get
+response data： json
+
+2、需要能获取到项目的详情数据（获取指定某一条数据）
+url:/projects/<int:pk>/
+method:get
+response data： json
+
+3、能够创建项目
+url:/projects/
+method:post
+request data: json
+response data： json {"msg":"创建成功","code":0}
+
+4、更新项目
+url:/projects/<int:pk>/
+method:put
+request data: json
+response data： json
+
+5、删除项目（只删除某一个项目）
+url:/projects/<int:pk>/
+method:delete
+request data: pk
