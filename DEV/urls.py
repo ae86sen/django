@@ -33,8 +33,7 @@ from projects.views import index_page, index_page2, ProjectsCR,ProjectsRUD
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('page/', include('projects.urls')),
-    path('projects/', ProjectsCR.as_view()),
-    path('projects/<int:pk>/', ProjectsRUD.as_view())
+    path('', include('projects.urls'))
     # path('index/', index_page),
     # path('index2/', index_page2)
 ]
