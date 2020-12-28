@@ -7,6 +7,8 @@ E-mail:369799130@qq.com
 """
 from rest_framework import serializers
 
+from projects.models import Projects
+
 
 class ProjectsSerializer(serializers.Serializer):
     """
@@ -21,3 +23,17 @@ class ProjectsSerializer(serializers.Serializer):
     tester = serializers.CharField(max_length=200, label='测试人员', help_text='测试人员', write_only=True)
     # 如果一个字段设置了write_only=True，那么该字段将不会返回，但是，如果返回结果serializer_obj.validated_data,那么依然会返回
     programmer = serializers.CharField(max_length=200, label='开发人员', help_text='开发人员', read_only=True)
+
+
+class ProjectsModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Projects
+        # fields = '__all__'
+        exclude = ('desc', 'create_time','update_time')
+        read_only_fields = ('id', 'desc')
+        # 可以在extra_kwargs属性中，来定制某些字段
+        extra_kwargs = {
+            'programmer': {
+                'write_only': True
+            }
+        }
