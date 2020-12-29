@@ -8,7 +8,7 @@ E-mail:369799130@qq.com
 from rest_framework import serializers
 
 from projects.models import Projects
-
+from interfaces.serializers import InterfacesModelSerializer
 
 class ProjectsSerializer(serializers.Serializer):
     """
@@ -26,10 +26,18 @@ class ProjectsSerializer(serializers.Serializer):
 
 
 class ProjectsModelSerializer(serializers.ModelSerializer):
+    # 父表获取字表信息
+    # a.默认可以使用子表模型类名小写_set
+    # interfaces_set = InterfacesModelSerializer(label='所拥有的接口', many=True)
+    # b.如果某个字段返回的结果有多条，那么需要添加many=True参数
+    # c.如果模型类中外键字段定义了related_name参数，那么会使用这个名称作为字段名
+    # interfaces_set = serializers.StringRelatedField(many=True)
+    # interfaces = serializers.StringRelatedField(many=True)
+
     class Meta:
         model = Projects
         # fields = '__all__'
-        exclude = ('desc', 'create_time','update_time')
+        exclude = ('desc', 'create_time', 'update_time')
         read_only_fields = ('id', 'desc')
         # 可以在extra_kwargs属性中，来定制某些字段
         extra_kwargs = {
@@ -37,3 +45,7 @@ class ProjectsModelSerializer(serializers.ModelSerializer):
                 'write_only': True
             }
         }
+
+    def create(self, validated_data):
+        # email = validated_data.pop('email')
+        return super().create(validated_data)

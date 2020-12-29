@@ -8,7 +8,8 @@ class Interfaces(models.Model):
     # 3、第二个参数为必传参数on_delete，指定父表记录被删除之后，子表中对应的记录的处理方式
     # 4、models.CASCADE：父表记录被删，子表自动删
     # 5、models.SET_NULL, null=True：父表记录被删，子表自动设置为null
-    projects = models.ForeignKey('projects.Projects', on_delete=models.CASCADE, verbose_name='所属项目', help_text='所属项目')
+    projects = models.ForeignKey('projects.Projects', on_delete=models.CASCADE, verbose_name='所属项目',
+                                 help_text='所属项目',related_name='interfaces')
     tester = models.CharField(verbose_name='测试人员', max_length=50, help_text='测试人员')
     desc = models.CharField(verbose_name='简要描述', max_length=200, null=True, blank=True, help_text='简要描述')
 

@@ -2,13 +2,13 @@ import json
 import random
 
 from faker import Faker
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.views import View
 
 from interfaces.models import Interfaces
 from projects.models import Projects
 from django.db import connection
-
+from interfaces.serializers import InterfacesModelSerializer
 from projects.serializers import ProjectsSerializer,ProjectsModelSerializer
 
 
@@ -160,17 +160,16 @@ class ProjectsRUD(View):
     def get_object(self,pk):
         try:
             obj = Projects.objects.get(id=pk)
-        except Exception as e:
-            result = {
-                "msg": "参数有误",
-                "code": 0
-            }
-            return JsonResponse(result, status=400)
+        except Exception:
+            raise Http404
         return obj
 
     def get(self, request, pk):
         """查询项目详情"""
         # 1、校验pk参数是否合法
+        # obj = Interfaces.objects.get(id=pk)
+        # serializer_obj = InterfacesModelSerializer(instance=obj)
+        # return JsonResponse(serializer_obj.data)
         obj = self.get_object(pk)
         # 2、将查询集对象转化为python类型：字典
         serializer_obj = ProjectsModelSerializer(instance=obj)
