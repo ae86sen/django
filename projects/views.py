@@ -131,7 +131,7 @@ class ProjectsCR(View):
         # 1、获取从前端传来的项目信息并转化为python中数据类型（字典或者嵌套字典的列表）
         # 第一层校验，校验是否为json格式数据
         try:
-            python_data = json.loads(request.body, encoding='utf-8')
+            python_data = json.loads(request.body)
         except Exception as e:
             result = {
                 "msg": "参数有误，需要json格式数据",

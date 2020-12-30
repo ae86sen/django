@@ -41,7 +41,6 @@ class Projects(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', help_text='创建时间')
     # 17、DateTimeField可以添加auto_now选项，django会自动添加更新记录时的时间
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间', help_text='更新时间')
-
     # 18、执行迁移脚本之后，生成的数据表名默认为 子应用名_模型类名小写
     class Meta:
         # 19、可以在模型类下定义Meta子类，Meta子类名称固定
