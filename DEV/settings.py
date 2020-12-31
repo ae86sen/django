@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'projects.apps.ProjectsConfig',
     'rest_framework',
+    'django_filters',
     'interfaces'
 ]
 
@@ -123,3 +124,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+# 在全局配置文件settings.py文件中的REST_FRAMEWORK字典里修改DRF框架的配置
+REST_FRAMEWORK = {
+    'NON_FIELD_ERRORS_KEY': 'errors',
+    # a.可以修改默认的渲染类（处理返回的数据形式）
+    'DEFAULT_RENDERER_CLASSES': [
+        # b.列表中的元素是有优先级的，第一个元素优先级最高
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.backends.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
+    ],
+}

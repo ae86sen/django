@@ -5,15 +5,16 @@ from faker import Faker
 from django.http import HttpResponse, JsonResponse, Http404
 from django.views import View
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework import status
-
-
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter
 from interfaces.models import Interfaces
 from projects.models import Projects
 from django.db import connection
 from interfaces.serializers import InterfacesModelSerializer
-from projects.serializers import ProjectsSerializer,ProjectsModelSerializer
+from projects.serializers import ProjectsSerializer, ProjectsModelSerializer
 
 
 def index_page(request):
@@ -108,23 +109,22 @@ class IndexPage(View):
         return HttpResponse("<h2>DELETE请求：hello,jack!</h2>")
 
 
-
-
-class ProjectsCR(APIView):
+class ProjectsCR(GenericAPIView):
+    queryset = Projects.objects.all()
+    serializer_class = ProjectsModelSerializer
+    # filter_backends = [DjangoFilterBackend, OrderingFilter]
+    ordering_fields = ["id", "name"]
+    # 需要过滤哪些就写哪些，名字必须与模型类中字段一致
+    filterset_fields = ["name", "id"]
 
     def get(self, request):
         """查询所有项目"""
         # 1、从数据库中获取所有的项目信息（查询集）
-        qs = Projects.objects.all()
-        # 2、将模型类对象（查询集）转化为嵌套字典的列表
-        # 1.可以使用序列化器类来进行序列化输出
-        # a.instance参数可以传模型类对象
-        # b.instance参数可以传查询集（多条记录），many=True
-        # c.可以ProjectsSerializer序列化器对象，调用data属性，可以将模型类对象转化为Python中的数据类型
-        # d.如果未传递many=True参数，那么序列化器对象.data，返回字典，否则返回一个嵌套字典的列表
-        serializer_obj = ProjectsModelSerializer(instance=qs, many=True)
-
-        return Response(serializer_obj.data,status=status.HTTP_200_OK)
+        qs = self.get_queryset()
+        qs = self.filter_queryset(qs)
+        # 相当于ProjectsModelSerializer(*args,**kwargs)
+        serializer_obj = self.get_serializer(instance=qs, many=True)
+        return Response(serializer_obj.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         """添加项目"""
@@ -156,12 +156,12 @@ class ProjectsCR(APIView):
         # 4、向前端返回json格式数据
         ret['msg'] = '创建成功'
         ret.update(serializer_obj.data)
-        return JsonResponse(ret,status=status.HTTP_201_CREATED)
+        return JsonResponse(ret, status=status.HTTP_201_CREATED)
 
 
 class ProjectsRUD(View):
 
-    def get_object(self,pk):
+    def get_object(self, pk):
         try:
             obj = Projects.objects.get(id=pk)
         except Exception:
@@ -178,7 +178,7 @@ class ProjectsRUD(View):
         # 2、将查询集对象转化为python类型：字典
         serializer_obj = ProjectsModelSerializer(instance=obj)
         # 3、将字典输出到前端
-        return Response(serializer_obj.data,status=status.HTTP_200_OK)
+        return Response(serializer_obj.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         """修改项目信息"""
