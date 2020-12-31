@@ -4,6 +4,10 @@ import random
 from faker import Faker
 from django.http import HttpResponse, JsonResponse, Http404
 from django.views import View
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
 
 from interfaces.models import Interfaces
 from projects.models import Projects
@@ -106,7 +110,7 @@ class IndexPage(View):
 
 
 
-class ProjectsCR(View):
+class ProjectsCR(APIView):
 
     def get(self, request):
         """查询所有项目"""
@@ -120,7 +124,7 @@ class ProjectsCR(View):
         # d.如果未传递many=True参数，那么序列化器对象.data，返回字典，否则返回一个嵌套字典的列表
         serializer_obj = ProjectsModelSerializer(instance=qs, many=True)
 
-        return JsonResponse(serializer_obj.data, safe=False)
+        return Response(serializer_obj.data,status=status.HTTP_200_OK)
 
     def post(self, request):
         """添加项目"""
@@ -130,29 +134,29 @@ class ProjectsCR(View):
         }
         # 1、获取从前端传来的项目信息并转化为python中数据类型（字典或者嵌套字典的列表）
         # 第一层校验，校验是否为json格式数据
-        try:
-            python_data = json.loads(request.body)
-        except Exception as e:
-            result = {
-                "msg": "参数有误，需要json格式数据",
-                "code": 0
-            }
-            return JsonResponse(result, status=400)
+        # try:
+        #     python_data = json.loads(request.body)
+        # except Exception as e:
+        #     result = {
+        #         "msg": "参数有误，需要json格式数据",
+        #         "code": 0
+        #     }
+        #     return Response(result, status=status.HTTP_400_BAD_REQUEST)
         # 2、校验字段
         # 第二层校验，校验字段是否合法
-        serializer_obj = ProjectsModelSerializer(data=python_data)
+        serializer_obj = ProjectsModelSerializer(data=request.data)
         try:
             serializer_obj.is_valid(raise_exception=True)
         except Exception:
             ret['msg'] = '参数错误'
             ret.update(serializer_obj.errors)
-            return JsonResponse(ret, status=400)
+            return Response(ret, status=status.HTTP_400_BAD_REQUEST)
         # 3、校验通过则创建项目
         serializer_obj.save()
         # 4、向前端返回json格式数据
         ret['msg'] = '创建成功'
         ret.update(serializer_obj.data)
-        return JsonResponse(ret)
+        return JsonResponse(ret,status=status.HTTP_201_CREATED)
 
 
 class ProjectsRUD(View):
@@ -174,7 +178,7 @@ class ProjectsRUD(View):
         # 2、将查询集对象转化为python类型：字典
         serializer_obj = ProjectsModelSerializer(instance=obj)
         # 3、将字典输出到前端
-        return JsonResponse(serializer_obj.data)
+        return Response(serializer_obj.data,status=status.HTTP_200_OK)
 
     def put(self, request, pk):
         """修改项目信息"""
@@ -185,27 +189,27 @@ class ProjectsRUD(View):
         # a.校验pk值并获取待更新的模型类对象
         obj = self.get_object(pk)
         # b.校验前端所传的json数据是否合法
-        try:
-            python_data = json.loads(request.body)
-        except Exception:
-            result = {
-                "msg": "参数有误，需要json格式数据",
-                "code": 0
-            }
-            return JsonResponse(result, status=400)
+        # try:
+        #     python_data = json.loads(request.body)
+        # except Exception:
+        #     result = {
+        #         "msg": "参数有误，需要json格式数据",
+        #         "code": 0
+        #     }
+        #     return Response(result, status=status.HTTP_400_BAD_REQUEST)
         # c.更新操作
         # 如果在定义序列化器对象时，同时指定instance和data参数
         # a.调用序列化器对象.save()方法，会自动调用序列化器类中的update方法
-        serializer_obj = ProjectsModelSerializer(instance=obj, data=python_data)
+        serializer_obj = ProjectsModelSerializer(instance=obj, data=request.data)
         try:
             serializer_obj.is_valid(raise_exception=True)
         except Exception:
             ret['msg'] = '参数有误'
             ret.update(serializer_obj.errors)
-            return JsonResponse(ret, status=400)
+            return Response(ret, status=status.HTTP_400_BAD_REQUEST)
         serializer_obj.save()
         # d.向前端返回json格式的数据
-        return JsonResponse(serializer_obj.data, status=201)
+        return Response(serializer_obj.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
         """删除项目"""
@@ -218,4 +222,4 @@ class ProjectsRUD(View):
             'msg': '删除成功',
             'code': 1
         }
-        return JsonResponse(python_data, status=200)
+        return Response(python_data, status=status.HTTP_204_NO_CONTENT)
