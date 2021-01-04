@@ -137,4 +137,6 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.backends.DjangoFilterBackend',
         'rest_framework.filters.OrderingFilter',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'utils.pagination.MyPagination',
+    'PAGE_SIZE': 2
 }

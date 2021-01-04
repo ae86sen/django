@@ -119,10 +119,15 @@ class ProjectsCR(GenericAPIView):
 
     def get(self, request):
         """查询所有项目"""
-        # 1、从数据库中获取所有的项目信息（查询集）
-        qs = self.get_queryset()
-        qs = self.filter_queryset(qs)
-        # 相当于ProjectsModelSerializer(*args,**kwargs)
+        qs = self.filter_queryset(self.get_queryset())
+        # 对查询结果进行分页查询，返回结果依然是个查询集对象，有可能为空
+        page = self.paginate_queryset(qs)
+        # 如果不为空，则进行分页
+        if page is not None:
+            # 获取序列化对象
+            serializer_obj = self.get_serializer(instance=page, many=True)
+            # 返回分页查询结果
+            return self.get_paginated_response(serializer_obj.data)
         serializer_obj = self.get_serializer(instance=qs, many=True)
         return Response(serializer_obj.data, status=status.HTTP_200_OK)
 
@@ -159,67 +164,30 @@ class ProjectsCR(GenericAPIView):
         return JsonResponse(ret, status=status.HTTP_201_CREATED)
 
 
-class ProjectsRUD(View):
+class ProjectsRUD(GenericAPIView):
+    queryset = Projects.objects.all()
+    serializer_class = ProjectsModelSerializer
 
-    def get_object(self, pk):
-        try:
-            obj = Projects.objects.get(id=pk)
-        except Exception:
-            raise Http404
-        return obj
-
-    def get(self, request, pk):
+    def get(self, request,pk):
         """查询项目详情"""
-        # 1、校验pk参数是否合法
-        # obj = Interfaces.objects.get(id=pk)
-        # serializer_obj = InterfacesModelSerializer(instance=obj)
-        # return JsonResponse(serializer_obj.data)
-        obj = self.get_object(pk)
-        # 2、将查询集对象转化为python类型：字典
+        obj = self.get_object()
         serializer_obj = ProjectsModelSerializer(instance=obj)
-        # 3、将字典输出到前端
         return Response(serializer_obj.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk):
+    def put(self, request,pk):
         """修改项目信息"""
-        ret = {
-            "msg": "",
-            "code": 0
-        }
-        # a.校验pk值并获取待更新的模型类对象
-        obj = self.get_object(pk)
-        # b.校验前端所传的json数据是否合法
-        # try:
-        #     python_data = json.loads(request.body)
-        # except Exception:
-        #     result = {
-        #         "msg": "参数有误，需要json格式数据",
-        #         "code": 0
-        #     }
-        #     return Response(result, status=status.HTTP_400_BAD_REQUEST)
-        # c.更新操作
-        # 如果在定义序列化器对象时，同时指定instance和data参数
-        # a.调用序列化器对象.save()方法，会自动调用序列化器类中的update方法
+        obj = self.get_object()
         serializer_obj = ProjectsModelSerializer(instance=obj, data=request.data)
-        try:
-            serializer_obj.is_valid(raise_exception=True)
-        except Exception:
-            ret['msg'] = '参数有误'
-            ret.update(serializer_obj.errors)
-            return Response(ret, status=status.HTTP_400_BAD_REQUEST)
+        serializer_obj.is_valid(raise_exception=True)
         serializer_obj.save()
         # d.向前端返回json格式的数据
         return Response(serializer_obj.data, status=status.HTTP_200_OK)
 
-    def delete(self, request, pk):
+    def delete(self, request,pk):
         """删除项目"""
         # a.校验pk值并获取待删除的模型类对象
-        obj = self.get_object(pk)
+        obj = self.get_object()
 
         obj.delete()
 
-        python_data = {
-            'msg': '删除成功',
-            'code': 1
-        }
-        return Response(python_data, status=status.HTTP_204_NO_CONTENT)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
