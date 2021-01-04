@@ -1,5 +1,4 @@
 from django.db import models
-
 # Create your models here.
 """
 1、一个mysql软件中，可以有多个数据库
