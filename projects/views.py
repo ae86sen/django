@@ -20,26 +20,21 @@ from interfaces.serializers import InterfacesModelSerializer
 from projects.serializers import ProjectsSerializer, ProjectsModelSerializer
 
 
-class ProjectsCR(generics.ListCreateAPIView):
-    queryset = Projects.objects.all()
-    serializer_class = ProjectsModelSerializer
-    # filter_backends = [DjangoFilterBackend, OrderingFilter]
-    ordering_fields = ["id", "name"]
-    # 需要过滤哪些就写哪些，名字必须与模型类中字段一致
-    filterset_fields = ["name", "id"]
+# class ProjectsCR(generics.ListCreateAPIView):
+#     queryset = Projects.objects.all()
+#     serializer_class = ProjectsModelSerializer
+#     # filter_backends = [DjangoFilterBackend, OrderingFilter]
+#     ordering_fields = ["id", "name"]
+#     # 需要过滤哪些就写哪些，名字必须与模型类中字段一致
+#     filterset_fields = ["name", "id"]
+#
+#
+# class ProjectsRUD(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Projects.objects.all()
+#     serializer_class = ProjectsModelSerializer
 
 
-class ProjectsRUD(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Projects.objects.all()
-    serializer_class = ProjectsModelSerializer
-
-
-class ProjectsViewSet(mixins.ListModelMixin,
-                      mixins.CreateModelMixin,
-                      mixins.RetrieveModelMixin,
-                      mixins.UpdateModelMixin,
-                      mixins.DestroyModelMixin,
-                      viewsets.GenericViewSet):
+class ProjectsViewSet(viewsets.ModelViewSet):
     queryset = Projects.objects.all()
     serializer_class = ProjectsModelSerializer
     # filter_backends = [DjangoFilterBackend, OrderingFilter]
