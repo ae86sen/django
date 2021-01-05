@@ -10,6 +10,8 @@ from django.urls import path
 
 urlpatterns = [
     path('projects/', views.ProjectsViewSet.as_view({'get': 'list', 'post': 'create'})),
+    path('projects/names/', views.ProjectsViewSet.as_view({'get': 'names'})),
+    path('projects/<int:pk>/interfaces/', views.ProjectsViewSet.as_view({'get': 'interfaces'})),
     path('projects/<int:pk>/', views.ProjectsViewSet.as_view({'get': 'retrieve',
                                                               'put': 'update', 'delete': 'destroy'}))
     # path('projects/', ProjectsCR.as_view())

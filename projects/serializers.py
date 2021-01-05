@@ -8,7 +8,9 @@ E-mail:369799130@qq.com
 from rest_framework import serializers
 
 from projects.models import Projects
+from interfaces.models import Interfaces
 from interfaces.serializers import InterfacesModelSerializer
+
 
 class ProjectsSerializer(serializers.Serializer):
     """
@@ -49,3 +51,23 @@ class ProjectsModelSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # email = validated_data.pop('email')
         return super().create(validated_data)
+
+
+class ProjectsNamesModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Projects
+        fields = ('id', 'name')
+
+
+class InterfacesNamesModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Interfaces
+        fields = ('id', 'name')
+
+
+class InterfacesByProjectIdModelSerializer(serializers.ModelSerializer):
+    interfaces = InterfacesNamesModelSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Projects
+        fields = ('interfaces',)
