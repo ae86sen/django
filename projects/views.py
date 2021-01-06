@@ -39,6 +39,16 @@ from projects.serializers import ProjectsSerializer, \
 
 
 class ProjectsViewSet(viewsets.ModelViewSet):
+    """
+    list:
+        获取项目列表
+    retrieve:
+        获取项目详情
+    create:
+        添加项目
+    destroy:
+        删除项目
+    """
     queryset = Projects.objects.all()
     serializer_class = ProjectsModelSerializer
     # filter_backends = [DjangoFilterBackend, OrderingFilter]
@@ -46,7 +56,7 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     # 需要过滤哪些就写哪些，名字必须与模型类中字段一致
     filterset_fields = ["name", "id"]
 
-    @action(methods=['get'], detail=False)
+    @action(methods=['get'], detail=False, url_path='xxxx')
     def names(self, request, *args, **kwargs):
         # 过滤
         qs = self.filter_queryset(self.get_queryset())
