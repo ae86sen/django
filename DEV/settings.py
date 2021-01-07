@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import datetime
 import os
 import sys
 from pathlib import Path
@@ -141,7 +142,20 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'utils.pagination.MyPagination',
     'PAGE_SIZE': 2,
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # token认证
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        # 会话认证（session）
+        'rest_framework.authentication.SessionAuthentication',
+        # 账号密码认证，这俩一般在一起出现，只有账号密码通过后，才会有session
+        'rest_framework.authentication.BasicAuthentication'
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 指定认证之后获取的权限，默认为不需要登录就有任意权限
+        'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.IsAuthenticated'
+    ],
 }
 
 
@@ -196,4 +210,10 @@ LOGGING = {
             'level': 'DEBUG',  # 日志器接收的最低日志级别
         },
     }
+}
+
+JWT_AUTH = {
+        'JWT_RESPONSE_PAYLOAD_HANDLER':
+        'utils.jwt_handle.jwt_response_payload_handler',
+        'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
 }

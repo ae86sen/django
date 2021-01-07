@@ -13,6 +13,8 @@ from rest_framework import mixins
 from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework import permissions
+from rest_framework import authentication
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from interfaces.models import Interfaces
@@ -45,6 +47,8 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     ordering_fields = ["id", "name"]
     # 需要过滤哪些就写哪些，名字必须与模型类中字段一致
     filterset_fields = ["name", "id"]
+    # authentication_classes = []
+    permission_classes = [permissions.IsAuthenticated]
 
     @action(methods=['get'], detail=False, url_path='xxxx')
     def names(self, request, *args, **kwargs):
