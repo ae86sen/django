@@ -1,4 +1,5 @@
 import json
+import logging
 import random
 
 from faker import Faker
@@ -23,19 +24,8 @@ from projects.serializers import ProjectsSerializer, \
     ProjectsNamesModelSerializer, \
     InterfacesByProjectIdModelSerializer
 
-
-# class ProjectsCR(generics.ListCreateAPIView):
-#     queryset = Projects.objects.all()
-#     serializer_class = ProjectsModelSerializer
-#     # filter_backends = [DjangoFilterBackend, OrderingFilter]
-#     ordering_fields = ["id", "name"]
-#     # 需要过滤哪些就写哪些，名字必须与模型类中字段一致
-#     filterset_fields = ["name", "id"]
-#
-#
-# class ProjectsRUD(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Projects.objects.all()
-#     serializer_class = ProjectsModelSerializer
+# 定义日志器用于记录日志，logging.getLogger('全局配置settings.py中定义的日志器名')
+logger = logging.getLogger('mytest')
 
 
 class ProjectsViewSet(viewsets.ModelViewSet):
@@ -62,6 +52,7 @@ class ProjectsViewSet(viewsets.ModelViewSet):
         qs = self.filter_queryset(self.get_queryset())
         # 分页
         page = self.paginate_queryset(qs)
+        logger.info(page)
         if page is not None:
             serializer = self.get_serializer(instance=page, many=True)
             return self.get_paginated_response(serializer.data)
