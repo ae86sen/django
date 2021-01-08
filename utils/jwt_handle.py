@@ -4,3 +4,5 @@ def jwt_response_payload_handler(token, user=None, request=None):
         'user_name': user.username,
         'token': token
     }
+
+

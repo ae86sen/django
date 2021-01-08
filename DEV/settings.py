@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'drf_yasg',
-    'interfaces'
+    'interfaces',
+    'user'
 ]
 
 MIDDLEWARE = [
@@ -146,7 +147,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # token认证
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        # 会话认证（session）
+        # # 会话认证（session）
         'rest_framework.authentication.SessionAuthentication',
         # 账号密码认证，这俩一般在一起出现，只有账号密码通过后，才会有session
         'rest_framework.authentication.BasicAuthentication'
